@@ -1,0 +1,6 @@
+[submodule "gector-large"]
+	path = gector-large
+	url = https://github.com/MaksTarnavskyi/gector-large
+[submodule "LM-Critic"]
+	path = LM-Critic
+	url = https://github.com/michiyasunaga/LM-Critic
