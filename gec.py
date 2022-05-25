@@ -72,7 +72,7 @@ class GECT5:
             clean_up_tokenization_spaces=True
         )
 
-        cnt = list(map(lambda x,y: 0 if x==y else 1, (sentence, corrected_sentence)))
+        cnt = list(map(lambda x,y: 0 if x==y else 1, sentence, corrected_sentence))
         return corrected_sentence, sum(cnt)
     
     def predict_for_file(self, input_file, output_file, batch_size=32):
