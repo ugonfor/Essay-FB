@@ -17,20 +17,19 @@ T5Config['model_generate'] =    {
 
 
 GECToRConfig = dict()
-GECToRConfig['model'] = {
-                            "vocab_path": 'gector-large/data/output_vocabulary',
-                            "max_len": args.max_len, min_len=args.min_len,
-                            "iterations": args.iteration_count,
-                            "min_error_probability": args.min_error_probability,
-                            "min_probability": args.min_error_probability,
-                            "lowercase_tokens": args.lowercase_tokens,
-                            "model_name": args.transformer_model,
-                            "special_tokens_fix": args.special_tokens_fix,
-                            "log": False,
-                            "confidence": args.additional_confidence,
-                            "is_ensemble": args.is_ensemble,
-                            "weigths": args.weights,
-                            "use_cpu": bool(args.use_cpu)
+GECToRConfig = {
+                            "vocab_path":'gector/data/output_vocabulary',
+                            #"model_paths":args.model_path,
+                            "max_len":50, 
+                            "min_len":3,
+                            "iterations":5,
+                            "min_error_probability":0.0,
+                            "lowercase_tokens":0,
+                            "model_name":'roberta',
+                            "special_tokens_fix":1,
+                            "log":False,
+                            "confidence":0,
+                            "del_confidence":0,
+                            "is_ensemble":0,
+                            "weigths":None
                         }
-
-GECToRConfig['cuda_device_index'] = -1 # cuda index
