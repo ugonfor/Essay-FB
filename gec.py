@@ -10,10 +10,11 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer
 from utils.helpers import read_lines, normalize
 from gector.gec_model import GecBERTModel
 
+import argparse
 
 
 class GECT5:
-    def __init__(self, model_name='t5-base', device = 'cuda:0'):
+    def __init__(self, input_file, output_file, batch_size, model_name='t5-base', device = 'cuda:0'):
         # model names
         # vennify/t5-base-grammar-correction
         # Unbabel/gec-t5_small
@@ -22,14 +23,18 @@ class GECT5:
         self.model_name = model_name
         self.device = device
 
+        self.input_file = input_file
+        self.output_file = output_file
+        self.batch_size = batch_size
+
+        self.config = T5Config
+
         self.model = None
         self.tokenizer = None
-        self.config = None
     
-    def init(self, config : Dict):
+    def init(self):
         self.model = T5ForConditionalGeneration.from_pretrained(self.model_name).to(self.device)
         self.tokenizer = T5Tokenizer.from_pretrained(self.model_name)
-        self.config = config
 
     def preprocess_sent(self, sentence, is_batch=False):
         # vennify/t5-base-grammar-correction
@@ -67,6 +72,40 @@ class GECT5:
             clean_up_tokenization_spaces=True
         )
         return corrected_sentence
+    
+    def predict_for_file(self, input_file, output_file, batch_size=32):
+        test_data = read_lines(input_file)
+        predictions = []
+        cnt_corrections = 0
+        batch = []
+        for sent in test_data:
+            batch.append(sent.split())
+            if len(batch) == batch_size:
+                preds, cnt = self.correction(batch, is_batch=True)
+                predictions.extend(preds)
+                cnt_corrections += cnt
+                batch = []
+        if batch:
+            preds, cnt = self.correction(batch, is_batch=True)
+            predictions.extend(preds)
+            cnt_corrections += cnt
+
+        result_lines = [" ".join(x) for x in predictions]
+
+        with open(output_file, 'w') as f:
+            f.write("\n".join(result_lines) + '\n')
+        return cnt_corrections
+
+    def predict(self):
+        # get all paths
+        self.init()
+
+        cnt_corrections = self.predict_for_file(self.input_file, self.output_file, batch_size=self.batch_size)
+
+        # evaluate with m2 or ERRANT
+        print(f"Produced overall corrections: {cnt_corrections}")
+
+
 
 
 class GECToR:
@@ -118,3 +157,31 @@ class GECToR:
 
         # evaluate with m2 or ERRANT
         print(f"Produced overall corrections: {cnt_corrections}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--input_file',
+                        help='for both',
+                        required=True)
+    parser.add_argument('--output_file',
+                        help='for both',
+                        required=True)
+    parser.add_argument('--batch_size',
+                        help='for both',
+                        required=True)
+
+    parser.add_argument('--model_path',
+                        help='for GECToR',
+                        required=True)
+    parser.add_argument('--model_name',
+                        help='for GECT5',
+                        default='t5-base')
+
+    args = parser.parse_args()
+
+    gect5  = GECT5(model_name=args.model_name, input_file=args.input_file, output_file=args.output_file+'.T5', batch_size=args.batch_size)
+    gector = GECToR(model_path=args.model_path, input_file=args.input_file, output_file=args.output_file+'.GECToR', batch_size=args.batch_size)
+
+    gect5.predict()
+    gector.predict()
