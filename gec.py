@@ -40,7 +40,7 @@ class GECT5:
         # vennify/t5-base-grammar-correction
         # Unbabel/gec-t5_small
         # deep-learning-analytics/GrammarCorrector
-        if self.model_name == 'vennify/t5-base-grammar-correction':
+        if self.model_name == 'deep-learning-analytics/GrammarCorrector':
             prefix = ""
         elif self.model_name == 'Unbabel/gec-t5_small':
             prefix = "gec: "
@@ -58,9 +58,9 @@ class GECT5:
 
     def correction(self, sentence, is_batch=False):
         
-        sentence = self.preprocess_sent(sentence, is_batch)
+        pre_sentence = self.preprocess_sent(sentence, is_batch)
 
-        tokenized_sentence = self.tokenizer(sentence, **self.config['tokenizer']).to(self.device)
+        tokenized_sentence = self.tokenizer(pre_sentence, **self.config['tokenizer']).to(self.device)
         generated_sentence = self.model.generate(
                             input_ids = tokenized_sentence.input_ids,
                             attention_mask = tokenized_sentence.attention_mask,
@@ -105,7 +105,7 @@ class GECT5:
         cnt_corrections = self.predict_for_file(self.input_file, self.output_file, batch_size=self.batch_size)
 
         # evaluate with m2 or ERRANT
-        print(f"Produced overall corrections: {cnt_corrections}")
+        print(f"Produced overall corrections: {cnt_corrections} (lines)")
 
 
 
@@ -151,14 +151,14 @@ class GECToR:
 
     def predict(self):
         # get all paths
-        model = GecBERTModel(model_path=self.model_path, **self.config)
+        model = GecBERTModel(model_paths=self.model_path, **self.config)
 
         cnt_corrections = self.predict_for_file(self.input_file, self.output_file, model,
                                         batch_size=self.batch_size, 
                                         to_normalize=self.normalize)
 
         # evaluate with m2 or ERRANT
-        print(f"Produced overall corrections: {cnt_corrections}")
+        print(f"Produced overall corrections: {cnt_corrections} (words)")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -174,7 +174,7 @@ if __name__ == "__main__":
                         required=True)
 
     parser.add_argument('--model_path',
-                        help='for GECToR',
+                        help='for GECToR', nargs='+',
                         required=True)
     parser.add_argument('--model_name',
                         help='for GECT5',
