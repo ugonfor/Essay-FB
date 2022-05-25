@@ -32,3 +32,5 @@ GECToRConfig['model'] = {
                             "weigths": args.weights,
                             "use_cpu": bool(args.use_cpu)
                         }
+
+GECToRConfig['cuda_device_index'] = -1 # cuda index
