@@ -12,7 +12,7 @@ T5Config['model_generate'] =    {
                                 "max_length":128,
                                 "num_beams":5,
                                 "early_stopping":True,
-                                "num_return_sequences":4 # return sequences
+                                "num_return_sequences":1 # return sequences
                                 }
 
 

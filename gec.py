@@ -1,5 +1,5 @@
 import sys, os
-sys.path.append(os.getcwd() + "/gector-large")
+sys.path.append(os.getcwd() + "/gector")
 sys.path.append(os.getcwd() + "/LM-Critic")
 
 from typing import Dict
@@ -52,7 +52,7 @@ class GECT5:
 
         if is_batch:
             assert type(sentence) == list
-            return list(map(lambda x: prefix + x), sentence)
+            return list(map(lambda x: prefix + x, sentence))
         else:
             return prefix + sentence
 
@@ -60,7 +60,7 @@ class GECT5:
         
         sentence = self.preprocess_sent(sentence, is_batch)
 
-        tokenized_sentence = self.tokenizer(sentence, **self.config['tokenizer'])
+        tokenized_sentence = self.tokenizer(sentence, **self.config['tokenizer']).to(self.device)
         generated_sentence = self.model.generate(
                             input_ids = tokenized_sentence.input_ids,
                             attention_mask = tokenized_sentence.attention_mask,
@@ -71,7 +71,9 @@ class GECT5:
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True
         )
-        return corrected_sentence
+
+        cnt = list(map(lambda x,y: 0 if x==y else 1, (sentence, corrected_sentence)))
+        return corrected_sentence, sum(cnt)
     
     def predict_for_file(self, input_file, output_file, batch_size=32):
         test_data = read_lines(input_file)
@@ -79,7 +81,7 @@ class GECT5:
         cnt_corrections = 0
         batch = []
         for sent in test_data:
-            batch.append(sent.split())
+            batch.append(sent)
             if len(batch) == batch_size:
                 preds, cnt = self.correction(batch, is_batch=True)
                 predictions.extend(preds)
@@ -90,7 +92,7 @@ class GECT5:
             predictions.extend(preds)
             cnt_corrections += cnt
 
-        result_lines = [" ".join(x) for x in predictions]
+        result_lines = [x for x in predictions]
 
         with open(output_file, 'w') as f:
             f.write("\n".join(result_lines) + '\n')
@@ -149,7 +151,7 @@ class GECToR:
 
     def predict(self):
         # get all paths
-        model = GecBERTModel(model_paths=self.model_paths, **self.config)
+        model = GecBERTModel(model_path=self.model_path, **self.config)
 
         cnt_corrections = self.predict_for_file(self.input_file, self.output_file, model,
                                         batch_size=self.batch_size, 
