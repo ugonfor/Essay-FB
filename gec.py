@@ -72,6 +72,7 @@ class GECT5:
             clean_up_tokenization_spaces=True
         )
 
+        corrected_sentence.tolist()
         cnt = list(map(lambda x,y: 0 if x==y else 1, sentence, corrected_sentence))
         return corrected_sentence, sum(cnt)
     
