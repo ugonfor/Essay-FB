@@ -72,7 +72,6 @@ class GECT5:
             clean_up_tokenization_spaces=True
         )
 
-        corrected_sentence.tolist()
         cnt = list(map(lambda x,y: 0 if x==y else 1, sentence, corrected_sentence))
         return corrected_sentence, sum(cnt)
     
@@ -83,7 +82,7 @@ class GECT5:
         batch = []
         for sent in test_data:
             batch.append(sent)
-            if len(batch) == batch_size:
+            if len(batch) >= batch_size:
                 preds, cnt = self.correction(batch, is_batch=True)
                 predictions.extend(preds)
                 cnt_corrections += cnt
@@ -131,7 +130,7 @@ class GECToR:
         batch = []
         for sent in test_data:
             batch.append(sent.split())
-            if len(batch) == batch_size:
+            if len(batch) >= batch_size:
                 preds, cnt = model.handle_batch(batch)
                 predictions.extend(preds)
                 cnt_corrections += cnt
@@ -171,7 +170,8 @@ if __name__ == "__main__":
                         help='for both',
                         required=True)
     parser.add_argument('--batch_size',
-                        help='for both',
+                        help='for both', 
+                        type=int,
                         required=True)
 
     parser.add_argument('--model_path',
