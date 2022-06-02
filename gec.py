@@ -1,6 +1,5 @@
 import sys, os
 sys.path.append(os.getcwd() + "/gector")
-sys.path.append(os.getcwd() + "/LM-Critic")
 
 from typing import Dict
 
@@ -181,10 +180,21 @@ if __name__ == "__main__":
                         help='for GECT5',
                         default='t5-base')
 
+    parser.add_argument('--model',
+                        help='t5/gector',
+                        required=True)
+
     args = parser.parse_args()
 
-    gect5  = GECT5(model_name=args.model_name, input_file=args.input_file, output_file=args.output_file+'.T5', batch_size=args.batch_size)
-    gector = GECToR(model_path=args.model_path, input_file=args.input_file, output_file=args.output_file+'.GECToR', batch_size=args.batch_size)
+    if args.model == 't5':
+        gect5  = GECT5(model_name=args.model_name, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+        gect5.predict()
+    
+    elif args.model == 'gector':
+        gector = GECToR(model_path=args.model_path, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+        gector.predict()
+    
+    else:
+        print('model error')
 
-    gect5.predict()
-    gector.predict()
+    print("DONE")
