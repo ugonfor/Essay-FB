@@ -178,11 +178,11 @@ if __name__ == "__main__":
                         required=True)
 
     parser.add_argument('--gector_path',
-                        help='for GECToR', nargs='+',
-                        required=True)
+                        help='for GECToR', nargs='+'
+                        )
     parser.add_argument('--t5_name',
                         help='for GECT5',
-                        default='t5-base')
+                        )
 
 
     args = parser.parse_args()
