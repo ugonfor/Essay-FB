@@ -173,25 +173,26 @@ if __name__ == "__main__":
                         type=int,
                         required=True)
 
-    parser.add_argument('--model_path',
-                        help='for GECToR', nargs='+',
-                        required=True)
-    parser.add_argument('--model_name',
-                        help='for GECT5',
-                        default='t5-base')
-
     parser.add_argument('--model',
                         help='t5/gector',
                         required=True)
 
+    parser.add_argument('--gector_path',
+                        help='for GECToR', nargs='+',
+                        required=True)
+    parser.add_argument('--t5_name',
+                        help='for GECT5',
+                        default='t5-base')
+
+
     args = parser.parse_args()
 
     if args.model == 't5':
-        gect5  = GECT5(model_name=args.model_name, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+        gect5  = GECT5(model_name=args.t5_name, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
         gect5.predict()
     
     elif args.model == 'gector':
-        gector = GECToR(model_path=args.model_path, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+        gector = GECToR(model_path=args.gector_path, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
         gector.predict()
     
     else:
