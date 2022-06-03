@@ -1,5 +1,3 @@
-from numpy import source
-
 
 data = './fce/m2/fce.test.gold.bea19.m2'
 
