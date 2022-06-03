@@ -51,6 +51,27 @@ def main(src_path, hyp_path):
     # Load embeddings of K most frequent words
     model.build_vocab_k_words(K=100000)
 
+
+    fs = open(src_path, 'rt')
+    fh = open(hyp_path, 'rt')
+
+    tot_sim = 0
+    num = 0
+
+    while 1:
+        line1 = fs.readline()
+        line2 = fh.readline()
+        
+        if line1 == '' and line2 == '':
+            break
+        
+        tot_sim += cosine(model.encode([line1])[0], model.encode([line2])[0])
+        num += 1
+
+    mean_sim = tot_sim/num
+
+    print(f"Mean Sentence Similarity: {mean_sim} for {num} lines")
+
 if __name__ == '__main__':
     print(test("this", "these"))
 
