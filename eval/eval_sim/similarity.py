@@ -3,6 +3,7 @@ import argparse
 
 import numpy as np
 import torch
+import torch.cuda
 
 import nltk
 nltk.download('punkt')
@@ -45,7 +46,7 @@ def main(src_path, hyp_path):
     model.load_state_dict(torch.load(MODEL_PATH))
 
     # Keep it on CPU or put it on GPU
-    use_cuda = False
+    use_cuda = torch.cuda.is_available()
     model = model.cuda() if use_cuda else model
 
     # If infersent1 -> use GloVe embeddings. If infersent2 -> use InferSent embeddings.
@@ -61,16 +62,40 @@ def main(src_path, hyp_path):
 
     tot_sim = 0
     num = 0
-
+    batch1 = []
+    batch2 = []
     while 1:
         line1 = fs.readline()
         line2 = fh.readline()
-        
+
+
         if line1 == '' and line2 == '':
+            batch1 = model.encode(batch1)
+            batch2 = model.encode(batch2)
+
+            for i in range(len(batch1)):
+                tot_sim += cosine(batch1[i], batch2[i])
+                num += 1
+
+            batch1 = []
+            batch2 = []
+            
             break
+
+        if len(batch1) == 64:
+            batch1 = model.encode(batch1)
+            batch2 = model.encode(batch2)
+
+            for i in range(len(batch1)):
+                tot_sim += cosine(batch1[i], batch2[i])
+                num += 1
+
+            batch1 = []
+            batch2 = []
+
+        batch1.append(line1)
+        batch2.append(line2)
         
-        tot_sim += cosine(model.encode([line1])[0], model.encode([line2])[0])
-        num += 1
 
     mean_sim = tot_sim/num
 
