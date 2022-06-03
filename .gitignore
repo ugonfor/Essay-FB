@@ -3,3 +3,7 @@ eval/bea19/fce*
 eval/bea19/gold.bea19
 eval/bea19/input.bea19
 eval/jfleg/test
+
+eval/eval_sim/GloVe
+eval/eval_sim/fastText
+eval/eval_sim/encoder
