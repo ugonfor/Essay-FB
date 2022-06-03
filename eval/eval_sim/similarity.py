@@ -1,7 +1,11 @@
 from random import randint
+import argparse
 
 import numpy as np
 import torch
+
+import nltk
+nltk.download('punkt')
 
 def cosine(u, v):
     return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
@@ -73,6 +77,18 @@ def main(src_path, hyp_path):
     print(f"Mean Sentence Similarity: {mean_sim} for {num} lines")
 
 if __name__ == '__main__':
-    print(test("this", "these"))
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--input_file',
+                        help='for both',
+                        required=True)
+    parser.add_argument('--output_file',
+                        help='for both',
+                        required=True)
+
+    args = parser.parse_args()
+
+    main(args.input_file, args.output_file)
 
     
