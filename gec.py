@@ -11,6 +11,8 @@ from gector.gec_model import GecBERTModel
 
 import argparse
 
+import toefl_utils
+
 
 class GECT5:
     def __init__(self, input_file, output_file, batch_size, model_name='t5-base', device = 'cuda:0'):
