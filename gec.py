@@ -183,19 +183,41 @@ if __name__ == "__main__":
     parser.add_argument('--t5_name',
                         help='for GECT5',
                         )
+    parser.add_argument('--toefl_format',
+                        help='use toefl format or not',
+                        action='store_true'
+                        )
 
 
     args = parser.parse_args()
 
-    if args.model == 't5':
-        gect5  = GECT5(model_name=args.t5_name, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
-        gect5.predict()
-    
-    elif args.model == 'gector':
-        gector = GECToR(model_path=args.gector_path, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
-        gector.predict()
-    
+    if args.toefl_format:
+        toefl_utils.preprocess(args.input_file, args.input_file+'.tmp')
+
+        if args.model == 't5':
+            gect5  = GECT5(model_name=args.t5_name, input_file=args.input_file+'.tmp', output_file=args.output_file+'.tmp', batch_size=args.batch_size)
+            gect5.predict()
+        
+        elif args.model == 'gector':
+            gector = GECToR(model_path=args.gector_path, input_file=args.input_file+'.tmp', output_file=args.output_file+'.tmp', batch_size=args.batch_size)
+            gector.predict()
+        
+        else:
+            print('model error')
+        
+        toefl_utils.postprocess(args.input_file, args.output_file+'.tmp', args.output_file)
+        
+
     else:
-        print('model error')
+        if args.model == 't5':
+            gect5  = GECT5(model_name=args.t5_name, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+            gect5.predict()
+        
+        elif args.model == 'gector':
+            gector = GECToR(model_path=args.gector_path, input_file=args.input_file, output_file=args.output_file, batch_size=args.batch_size)
+            gector.predict()
+        
+        else:
+            print('model error')
 
     print("DONE")
